@@ -49,13 +49,14 @@ try {
     $type = $webhook['type'];
     $data = $webhook['data'];
 
-    $a = match ($type) {
+    $isHandled = match ($type) {
         'payment_approved' => handlePaymentApprovedWebhook($data),
         'payment_captured' => handlePaymentCapturedWebhook($data),
         default => throw new ErrorException(sprintf('Unable to find handler for: %s', $type)),
     };
 
-    printf('Webhook %s processed, status: %s', $type, $a ? 'OK' : 'KO');
+    // Output
+    printf('Webhook %s processed, status: %s', $type, $isHandled ? 'OK' : 'KO');
 
 } catch (ErrorException $t) {
     printf($t->getMessage());
