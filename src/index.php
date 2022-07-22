@@ -27,10 +27,15 @@ try {
     if (($_SERVER['HTTP_CKO_SIGNATURE'] ?? null) !== hash_hmac('sha256', $body, $signatureKey))
         throw new ErrorException('Forbidden', 403);
 
-    // Check webhook type and data
+    // Check webhook type
     $webhook = json_decode($body, true);
-    if ($webhook && !in_array($webhook['type'], $acceptedWebhooks) || !array_key_exists('data', $webhook))
+    if (!is_array($webhook) && !in_array($webhook['type'], $acceptedWebhooks))
         throw new ErrorException('Not Acceptable', 406);
+
+    // Check webhook content
+    if (!array_key_exists('data', $webhook))
+        throw new ErrorException('Unprocessable Entity', 422);
+
 
 } catch (ErrorException $t) {
     header(sprintf('HTTP/1.1 %s %s', $t->getCode(), $t->getMessage()));
