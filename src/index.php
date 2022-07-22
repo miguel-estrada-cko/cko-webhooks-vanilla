@@ -23,13 +23,13 @@ try {
         throw new ErrorException('Unauthorized', 401);
 
     // Verify signature
-    $body = file_get_contents('php://input');
+    $body = file_get_contents('php://input') ?? '';
     if (($_SERVER['HTTP_CKO_SIGNATURE'] ?? null) !== hash_hmac('sha256', $body, $signatureKey))
         throw new ErrorException('Forbidden', 403);
 
-    // Check webhook type
-    $webhook = json_decode(file_get_contents('php://input'), true);
-    if (!in_array($webhook['type'], $acceptedWebhooks))
+    // Check webhook type and data
+    $webhook = json_decode($body, true);
+    if ($webhook && !in_array($webhook['type'], $acceptedWebhooks) || !array_key_exists('data', $webhook))
         throw new ErrorException('Not Acceptable', 406);
 
 } catch (ErrorException $t) {
