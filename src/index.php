@@ -15,16 +15,16 @@ $acceptedWebhooks = [
  */
 try {
     // Do not allow non-post request
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST')
+    if (($_SERVER['REQUEST_METHOD'] ?? null) !== 'POST')
         throw new ErrorException('Method Not Allowed', 405);
 
     // Check authorization header
-    if ($_SERVER['HTTP_AUTHORIZATION'] !== $authorizationKey)
+    if (($_SERVER['HTTP_AUTHORIZATION'] ?? null) !== $authorizationKey)
         throw new ErrorException('Unauthorized', 401);
 
     // Verify signature
     $body = file_get_contents('php://input');
-    if (hash_hmac('sha256', $body, $signatureKey) !== $_SERVER['HTTP_CKO_SIGNATURE'])
+    if (($_SERVER['HTTP_CKO_SIGNATURE'] ?? null) !== hash_hmac('sha256', $body, $signatureKey))
         throw new ErrorException('Forbidden', 403);
 
     // Check webhook type
